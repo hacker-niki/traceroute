@@ -14,8 +14,7 @@ enable_testing()
 
 add_executable(Traceroute main.cpp
         Traceroute.cpp
-        Traceroute.h
-        tests/TracerouteTests.cpp)
+        Traceroute.h)
 
 
 add_executable(TracerouteTests
