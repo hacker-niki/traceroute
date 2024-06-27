@@ -20,7 +20,7 @@
 
 class Traceroute {
 public:
-    void run(const std::string& ip, int max_hops, int timeout, int start_ttl, int port_num);
+    void run(const std::string &ip, int max_hops, int timeout, int start_ttl, int retries);
 
     static std::string ip_from_name(const std::string& address);
 

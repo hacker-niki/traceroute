@@ -13,7 +13,7 @@ void print_help(const char *program_name) {
               << "  -m, --max-hops N     Set the max number of hops (default: 30)\n"
               << "  -t, --timeout N      Set the timeout in seconds (default: 1)\n"
               << "  -f, --start-ttl N    Set the initial TTL value (default: 1)\n"
-              << "  -p, --port N         Set the destination port (default: 33434)" << std::endl;
+              << "  -r, --retries N      Set the retries count (default: 1)" << std::endl;
 }
 
 int main(int argc, char *argv[]) {
@@ -25,47 +25,53 @@ int main(int argc, char *argv[]) {
     int max_hops = 30;
     int timeout = 1;
     int start_ttl = 1;
-    int port = 33434;
+    int retries = 1;
 
     int option_index = 0;
     int c;
 
-    const char *short_options = "hm:t:f:p:";
+    const char *short_options = "hm:t:f:r:";
 
     const option long_options[] = {
             {"help",      no_argument,       nullptr, 'h'},
             {"max-hops",  required_argument, nullptr, 'm'},
             {"timeout",   required_argument, nullptr, 't'},
             {"start-ttl", required_argument, nullptr, 'f'},
-            {"port",      required_argument, nullptr, 'p'},
+            {"retries",   required_argument, nullptr, 'r'},
             {nullptr, 0,                     nullptr, 0}
     };
 
     while ((c = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1) {
-        switch (c) {
-            case 'h':
-                print_help(argv[0]);
-                return 0;
-            case 'm':
-                max_hops = std::stoi(optarg);
-                break;
-            case 't':
-                timeout = std::stoi(optarg);
-                break;
-            case 'f':
-                start_ttl = std::stoi(optarg);
-                break;
-            case 'p':
-                port = std::stoi(optarg);
-                break;
-            default:
-                print_help(argv[0]);
-                return 1;
+        try {
+            switch (c) {
+                case 'h':
+                    print_help(argv[0]);
+                    return 0;
+                case 'm':
+                    max_hops = std::stoi(optarg);
+                    break;
+                case 't':
+                    timeout = std::stoi(optarg);
+                    break;
+                case 'f':
+                    start_ttl = std::stoi(optarg);
+                    break;
+                case 'r':
+                    retries = std::stoi(optarg);
+                    break;
+                default:
+                    print_help(argv[0]);
+                    return 1;
+            }
+        } catch (...) {
+            std::cout << "\033[1;31mInvalid argument\033[0m\n";
+            print_help(argv[0]);
+            return 1;
         }
     }
 
     if (optind >= argc) {
-        std::cerr << "Error: hostname or ip is required\n";
+        std::cout << "\033[1;31mError: hostname or ip is required\033[0m\n";
         print_help(argv[0]);
         return 1;
     }
@@ -73,7 +79,7 @@ int main(int argc, char *argv[]) {
     std::string destination_address = argv[optind];
 
     Traceroute traceroute;
-    traceroute.run(destination_address, max_hops, timeout, start_ttl, port);
+    traceroute.run(destination_address, max_hops, timeout, start_ttl, retries);
 
     return 0;
 }
