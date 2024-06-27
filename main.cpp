@@ -49,15 +49,31 @@ int main(int argc, char *argv[]) {
                     return 0;
                 case 'm':
                     max_hops = std::stoi(optarg);
+                    if (max_hops <= 0) {
+                        std::cout << "\033[1;31mError: number of hops must be greater than 0\033[0m\n";
+                        return 1;
+                    }
                     break;
                 case 't':
                     timeout = std::stoi(optarg);
+                    if (timeout <= 0) {
+                        std::cout << "\033[1;31mError: the timeout must be greater than 0\033[0m\n";
+                        return 1;
+                    }
                     break;
                 case 'f':
                     start_ttl = std::stoi(optarg);
+                    if (start_ttl <= 0) {
+                        std::cout << "\033[1;31mError: time to live must be greater than 0\033[0m\n";
+                        return 1;
+                    }
                     break;
                 case 'r':
                     retries = std::stoi(optarg);
+                    if (retries <= 0) {
+                        std::cout << "\033[1;31mError: number of retries must be greater than 0\033[0m\n";
+                        return 1;
+                    }
                     break;
                 default:
                     print_help(argv[0]);

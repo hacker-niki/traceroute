@@ -13,8 +13,7 @@ std::string Traceroute::ip_from_name(const std::string &address) {
 
     struct hostent *he = gethostbyname(address.c_str());
     if (he == nullptr) {
-        std::cout << "\033[1;31mHost error\033[0m\n";
-        exit(1);
+        return {};
     }
 
     char *ip = new char[1024];
@@ -26,14 +25,13 @@ std::string Traceroute::name_from_ip(const std::string &ip) {
     struct in_addr ipaddr{};
 
     if (inet_pton(AF_INET, ip.c_str(), &ipaddr) != 1) {
-        std::cout << "\033[1;31mInvalid IP address format.\033[0m" << std::endl;
-        exit(1);
+        return {};
     }
 
     struct hostent *he = gethostbyaddr(&ipaddr, sizeof(ipaddr), AF_INET);
 
     if (he == nullptr) {
-        return std::string{};
+        return {};
     }
 
     char *hostname = new char[strlen(he->h_name) + 1];
@@ -44,6 +42,10 @@ std::string Traceroute::name_from_ip(const std::string &ip) {
 
 void Traceroute::run(const std::string &host, int max_hops, int timeout, int start_ttl, int retries) {
     std::string ip = Traceroute::ip_from_name(host);
+    if (ip == "") {
+        std::cout << "\033[1;31mHost error\033[0m\n";
+        exit(1);
+    }
 
     std::cout << "Traceroute to " << "\033[1;33m" << ip << "\033[0m" << std::endl;
     std::cout << "Max hops: " << "\033[1;33m" << max_hops << "\033[0m" << std::endl << std::endl;
@@ -106,7 +108,7 @@ void Traceroute::run(const std::string &host, int max_hops, int timeout, int sta
 
             struct sockaddr_in src_addr{};
             src_addr.sin_addr.s_addr = ip_response_header.saddr;
-
+            
             std::cout << " " << name_from_ip(inet_ntoa(src_addr.sin_addr)) << " " << "\033[1;35m"
                       << inet_ntoa(src_addr.sin_addr) << "\033[0m " << duration.count() << "ms";
 
